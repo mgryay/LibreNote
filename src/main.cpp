@@ -1,7 +1,7 @@
 #include <gtk/gtk.h>
 #include <cstring>
 
-/* ================== App Data ================== */
+
 struct AppData {
     GtkWindow   *window = nullptr;
     GtkTextView *textview = nullptr;
@@ -10,12 +10,12 @@ struct AppData {
     char        *last_search = nullptr;
 };
 
-/* ================== Clipboard ================== */
+
 static GdkClipboard* get_clipboard(AppData *d) {
     return gtk_widget_get_clipboard(GTK_WIDGET(d->textview));
 }
 
-/* ================== Helpers ================== */
+
 static void set_wrap(AppData *d, gboolean enabled) {
     gtk_text_view_set_wrap_mode(
         d->textview,
@@ -24,7 +24,7 @@ static void set_wrap(AppData *d, gboolean enabled) {
     d->word_wrap = enabled;
 }
 
-/* ================== Save Helpers ================== */
+
 static void save_to_file(AppData *d, GFile *file) {
     GtkTextBuffer *buf = gtk_text_view_get_buffer(d->textview);
     GtkTextIter start, end;
@@ -45,7 +45,7 @@ static void save_to_file(AppData *d, GFile *file) {
     g_free(text);
 }
 
-/* ================== Save As ================== */
+
 static void save_as_finish(GObject *src, GAsyncResult *res, gpointer user_data) {
     auto *d = static_cast<AppData*>(user_data);
     GError *err = nullptr;
@@ -70,7 +70,7 @@ static void action_save_as(GSimpleAction*, GVariant*, gpointer user_data) {
     gtk_file_dialog_save(dlg, d->window, nullptr, save_as_finish, d);
 }
 
-/* ================== Save ================== */
+
 static void action_save(GSimpleAction *a, GVariant *p, gpointer user_data) {
     auto *d = static_cast<AppData*>(user_data);
     if (d->current_file)
@@ -79,7 +79,7 @@ static void action_save(GSimpleAction *a, GVariant *p, gpointer user_data) {
         action_save_as(a, p, user_data);
 }
 
-/* ================== Open ================== */
+
 static void open_finish(GObject *src, GAsyncResult *res, gpointer user_data) {
     auto *d = static_cast<AppData*>(user_data);
     GError *err = nullptr;
@@ -140,7 +140,7 @@ static void action_select_all(GSimpleAction*, GVariant*, gpointer user_data) {
     gtk_text_buffer_select_range(b, &s, &e);
 }
 
-/* ================== View ================== */
+
 static void action_wrap(GSimpleAction *a, GVariant*, gpointer user_data) {
     auto *d = static_cast<AppData*>(user_data);
     gboolean enabled = !d->word_wrap;
@@ -148,12 +148,12 @@ static void action_wrap(GSimpleAction *a, GVariant*, gpointer user_data) {
     g_simple_action_set_state(a, g_variant_new_boolean(enabled));
 }
 
-/* ================== Quit ================== */
+
 static void action_quit(GSimpleAction*, GVariant*, gpointer user_data) {
     gtk_window_destroy(static_cast<AppData*>(user_data)->window);
 }
 
-/* ================== Find (Notepad-style) ================== */
+
 struct FindData {
     GtkWidget *window;
     GtkWidget *entry;
@@ -249,7 +249,7 @@ static void action_find(GSimpleAction*, GVariant*, gpointer user_data) {
     gtk_window_present(GTK_WINDOW(win));
 }
 
-/* ================== Status Bar ================== */
+
 static void update_status(AppData *d) {
     GtkTextBuffer *buf = gtk_text_view_get_buffer(d->textview);
     GtkTextIter iter;
@@ -267,7 +267,7 @@ static void update_status(AppData *d) {
     );
 }
 
-/* ================== Activate ================== */
+
 static void activate(GtkApplication *app, gpointer) {
     auto *d = new AppData();
 
@@ -281,7 +281,7 @@ static void activate(GtkApplication *app, gpointer) {
     GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_window_set_child(d->window, vbox);
 
-    /* TextView and Scroll */
+
     d->textview = GTK_TEXT_VIEW(gtk_text_view_new());
     set_wrap(d, TRUE);
 
@@ -294,7 +294,7 @@ static void activate(GtkApplication *app, gpointer) {
     );
     gtk_box_append(GTK_BOX(vbox), scroll);
 
-    /* Status Bar */
+
     GtkWidget *status = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
     gtk_widget_set_hexpand(status, TRUE);
     gtk_box_append(GTK_BOX(vbox), status);
@@ -314,7 +314,7 @@ static void activate(GtkApplication *app, gpointer) {
 
     GtkTextBuffer *buf = gtk_text_view_get_buffer(d->textview);
 
-    /* ==== ONLY FIX: NULL-safe strcmp ==== */
+   
     g_signal_connect(
         buf,
         "mark-set",
@@ -326,7 +326,7 @@ static void activate(GtkApplication *app, gpointer) {
         d
     );
 
-    /* Actions and Menus */
+
     const GActionEntry acts[] = {
         {"open", action_open},
         {"save", action_save},
@@ -372,7 +372,7 @@ static void activate(GtkApplication *app, gpointer) {
     gtk_window_present(d->window);
 }
 
-/* ================== main ================== */
+
 int main(int argc, char **argv) {
     GtkApplication *app = gtk_application_new(
         "org.libresuite.librenote",
